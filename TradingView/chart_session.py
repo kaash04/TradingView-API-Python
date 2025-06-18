@@ -300,7 +300,7 @@ class ChartSession:
         """Register callback for update event"""
         self.callbacks['update'].append(callback)
     
-    def on_error(self, callback: Callable[[str, ...], None]) -> None:
+    def on_error(self, callback: Callable[[str, None], None]) -> None:
         """Register callback for error event"""
         self.callbacks['error'].append(callback)
     
