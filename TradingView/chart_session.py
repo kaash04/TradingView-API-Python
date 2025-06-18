@@ -28,9 +28,6 @@ class ChartSession:
         """
         self.client = client
         self.chart_session_id = gen_session_id('cs')
-        self.replay_session_id = gen_session_id('rs')
-        self.replay_mode = False
-        self.replay_ok_callbacks: Dict[str, Callable] = {}
         
         # Data storage
         self.periods: Dict[int, PricePeriod] = {}
@@ -43,10 +40,6 @@ class ChartSession:
             'seriesLoaded': [],
             'symbolLoaded': [],
             'update': [],
-            'replayLoaded': [],
-            'replayPoint': [],
-            'replayResolution': [],
-            'replayEnd': [],
             'event': [],
             'error': []
         }
@@ -64,18 +57,12 @@ class ChartSession:
         return sorted(self.periods.values(), key=lambda x: x['time'], reverse=True)
     
     def _register_sessions(self) -> None:
-        """Register chart and replay sessions with the client"""
+        """Register chart session with the client"""
         
         # Chart session
         self.client.sessions[self.chart_session_id] = {
             'type': 'chart',
             'onData': self._handle_chart_data
-        }
-        
-        # Replay session
-        self.client.sessions[self.replay_session_id] = {
-            'type': 'replay',
-            'onData': self._handle_replay_data
         }
         
         # Create chart session
@@ -152,38 +139,8 @@ class ChartSession:
             self._handle_error('Critical error:', data[1], data[2])
     
     def _handle_replay_data(self, packet: Dict[str, Any]) -> None:
-        """Handle replay session data"""
-        if self.client.debug:
-            self.logger.debug(f"REPLAY SESSION DATA: {packet}")
-        
-        packet_type = packet.get('type')
-        data = packet.get('data', [])
-        
-        if packet_type == 'replay_ok':
-            callback_id = data[1]
-            if callback_id in self.replay_ok_callbacks:
-                self.replay_ok_callbacks[callback_id]()
-                del self.replay_ok_callbacks[callback_id]
-            return
-        
-        if packet_type == 'replay_instance_id':
-            self._handle_event('replayLoaded', data[1])
-            return
-        
-        if packet_type == 'replay_point':
-            self._handle_event('replayPoint', data[1])
-            return
-        
-        if packet_type == 'replay_resolutions':
-            self._handle_event('replayResolution', data[1], data[2])
-            return
-        
-        if packet_type == 'replay_data_end':
-            self._handle_event('replayEnd')
-            return
-        
-        if packet_type == 'critical_error':
-            self._handle_error('Critical error:', data[1], data[2])
+        """Handle replay session data - REMOVED"""
+        pass
     
     def _handle_event(self, event: str, *data: Any) -> None:
         """Handle internal events"""
@@ -251,11 +208,6 @@ class ChartSession:
         
         self.periods = {}
         
-        # Handle replay mode
-        if self.replay_mode:
-            self.replay_mode = False
-            self.client.send('replay_delete_session', [self.replay_session_id])
-        
         # Prepare symbol initialization
         symbol_init = {
             'symbol': symbol or 'BTCEUR',
@@ -269,40 +221,25 @@ class ChartSession:
         if options.get('currency'):
             symbol_init['currency-id'] = options['currency']
         
-        # Handle replay mode
-        if options.get('replay'):
-            if not self.replay_mode:
-                self.replay_mode = True
-                self.client.send('replay_create_session', [self.replay_session_id])
-            
-            self.client.send('replay_add_series', [
-                self.replay_session_id,
-                'req_replay_addseries',
-                f"={json.dumps(symbol_init)}",
-                options.get('timeframe', '240')
-            ])
-            
-            self.client.send('replay_reset', [
-                self.replay_session_id,
-                'req_replay_reset',
-                options['replay']
-            ])
+        # Determine if we need complex chart handling (custom chart types)
+        has_custom_type = options.get('type')
         
-        # Handle complex chart types
-        complex_chart = options.get('type') or options.get('replay')
-        chart_init = {} if complex_chart else symbol_init
-        
-        if complex_chart:
-            if options.get('replay'):
-                chart_init['replay'] = self.replay_session_id
+        # Initialize chart configuration
+        if has_custom_type:
+            chart_init = {}
             chart_init['symbol'] = symbol_init
-            chart_init['type'] = CHART_TYPES.get(options.get('type', ''))
-            if options.get('type') and options.get('inputs'):
-                chart_init['inputs'] = options['inputs']
+            
+            # Handle custom chart types
+            chart_init['type'] = CHART_TYPES.get(options['type'], options['type'])
+            # Always include inputs for custom chart types, even if empty
+            chart_init['inputs'] = options.get('inputs', {})
+        else:
+            # Simple chart - use symbol_init directly
+            chart_init = symbol_init
         
         self.current_series += 1
         
-        # Resolve symbol
+        # Resolve symbol with the prepared chart configuration
         self.client.send('resolve_symbol', [
             self.chart_session_id,
             f"ser_{self.current_series}",
@@ -354,30 +291,6 @@ class ChartSession:
         """Fetch more historical data"""
         self.client.send('request_more_data', [self.chart_session_id, number])
     
-    def replay_step(self, number: int = 1) -> None:
-        """Step forward in replay mode"""
-        if not self.replay_mode:
-            self._handle_error('Replay mode not active')
-            return
-        
-        self.client.send('replay_step_forward', [self.replay_session_id, number])
-    
-    def replay_start(self, interval: int = 1000) -> None:
-        """Start replay mode"""
-        if not self.replay_mode:
-            self._handle_error('Replay mode not active')
-            return
-        
-        self.client.send('replay_play', [self.replay_session_id, interval])
-    
-    def replay_stop(self) -> None:
-        """Stop replay mode"""
-        if not self.replay_mode:
-            self._handle_error('Replay mode not active')
-            return
-        
-        self.client.send('replay_stop', [self.replay_session_id])
-    
     # Event handlers
     def on_symbol_loaded(self, callback: Callable[[], None]) -> None:
         """Register callback for symbol loaded event"""
@@ -387,22 +300,6 @@ class ChartSession:
         """Register callback for update event"""
         self.callbacks['update'].append(callback)
     
-    def on_replay_loaded(self, callback: Callable[[str], None]) -> None:
-        """Register callback for replay loaded event"""
-        self.callbacks['replayLoaded'].append(callback)
-    
-    def on_replay_resolution(self, callback: Callable[[Any, Any], None]) -> None:
-        """Register callback for replay resolution event"""
-        self.callbacks['replayResolution'].append(callback)
-    
-    def on_replay_end(self, callback: Callable[[], None]) -> None:
-        """Register callback for replay end event"""
-        self.callbacks['replayEnd'].append(callback)
-    
-    def on_replay_point(self, callback: Callable[[int], None]) -> None:
-        """Register callback for replay point event"""
-        self.callbacks['replayPoint'].append(callback)
-    
     def on_error(self, callback: Callable[[str, ...], None]) -> None:
         """Register callback for error event"""
         self.callbacks['error'].append(callback)
@@ -410,5 +307,3 @@ class ChartSession:
     def delete(self) -> None:
         """Delete the chart session"""
         self.client.remove_session(self.chart_session_id)
-        if self.replay_mode:
-            self.client.remove_session(self.replay_session_id) 
