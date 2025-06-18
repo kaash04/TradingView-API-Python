@@ -10,6 +10,12 @@ A Python client for the TradingView WebSocket API, providing real-time market da
 - 🔄 **Ping/Pong**: Automatic connection keep-alive
 - 📈 **Multiple Symbols**: Subscribe to multiple symbols simultaneously
 
+## Support
+
+If you like this project, consider buying me a coffee 😊
+
+[![Buy Me a Coffee](https://img.shields.io/badge/-Buy%20Me%20a%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/2k21akashx)
+
 ## Installation
 
 ```bash
