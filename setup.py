@@ -10,7 +10,7 @@ def read_readme():
     return "TradingView API - Python implementation for anonymous access to TradingView market data"
 
 setup(
-    name="TradingView",
+    name="TradingView-API",
     version="1.0.0",
     author="TradingView Python API Contributors",
     author_email="",

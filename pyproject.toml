@@ -3,7 +3,7 @@ requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "TradingView"
+name = "TradingView-API"
 dynamic = ["version"]
 description = "Python implementation for anonymous access to TradingView market data via WebSocket and symbol search"
 readme = "README.md"
