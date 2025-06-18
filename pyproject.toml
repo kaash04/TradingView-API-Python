@@ -1,0 +1,94 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "TradingView"
+dynamic = ["version"]
+description = "Python implementation for anonymous access to TradingView market data via WebSocket and symbol search"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "TradingView Python API Contributors"}
+]
+keywords = ["tradingview", "websocket", "api", "financial", "trading", "market-data"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Office/Business :: Financial :: Investment",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+requires-python = ">=3.7"
+dependencies = [
+    "websockets>=10.0",
+    "requests>=2.25.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "pytest-asyncio>=0.18.0",
+    "black>=21.0",
+    "flake8>=3.8",
+    "mypy>=0.800",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/TradingView-Python"
+Repository = "https://github.com/yourusername/TradingView-Python"
+Documentation = "https://github.com/yourusername/TradingView-Python#readme"
+"Bug Tracker" = "https://github.com/yourusername/TradingView-Python/issues"
+
+[tool.setuptools]
+packages = ["TradingView"]
+
+[tool.setuptools_scm]
+write_to = "TradingView/_version.py"
+
+[tool.black]
+line-length = 88
+target-version = ['py37']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.mypy]
+python_version = "3.7"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "websockets.*",
+    "requests.*",
+]
+ignore_missing_imports = true 

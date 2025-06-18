@@ -1,0 +1,9 @@
+include README.md
+include LICENSE
+include pyproject.toml
+recursive-include TradingView *.py
+recursive-include examples *.py
+global-exclude *.pyc
+global-exclude __pycache__
+global-exclude .git*
+global-exclude .DS_Store 
