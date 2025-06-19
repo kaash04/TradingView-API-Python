@@ -175,7 +175,7 @@ Unsubscribe from market data.
 ### Setup
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/kaash04/TradingView-API-Python.git
 cd TradingView-Python
 pip install -e .
 ```
