@@ -11,16 +11,16 @@ def read_readme():
 
 setup(
     name="TradingView-API",
-    version="1.0.0",
+    version="1.0.1",
     author="TradingView Python API Contributors",
     author_email="",
     description="Python implementation for anonymous access to TradingView market data via WebSocket and symbol search",
     long_description=read_readme(),
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/tradingview-python",
+    url="https://github.com/kaash04/TradingView-API-Python",
     packages=["TradingView"],
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Beta",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
@@ -49,8 +49,8 @@ setup(
     },
     keywords="tradingview, websocket, api, financial, trading, market-data",
     project_urls={
-        "Bug Reports": "https://github.com/yourusername/tradingview-python/issues",
-        "Source": "https://github.com/yourusername/tradingview-python",
-        "Documentation": "https://github.com/yourusername/tradingview-python#readme",
+        "Bug Reports": "https://github.com/kaash04/TradingView-API-Python/issues",
+        "Source": "https://github.com/kaash04/TradingView-API-Python",
+        "Documentation": "https://github.com/kaash04/TradingView-API-Python#readme",
     },
 ) 

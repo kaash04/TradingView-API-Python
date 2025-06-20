@@ -42,10 +42,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/TradingView-Python"
-Repository = "https://github.com/yourusername/TradingView-Python"
-Documentation = "https://github.com/yourusername/TradingView-Python#readme"
-"Bug Tracker" = "https://github.com/yourusername/TradingView-Python/issues"
+Homepage = "https://github.com/kaash04/TradingView-API-Python"
+Repository = "https://github.com/kaash04/TradingView-API-Python"
+Documentation = "https://github.com/kaash04/TradingView-API-Python#readme"
+"Bug Tracker" = "https://github.com/kaash04/TradingView-API-Python/issues"
 
 [tool.setuptools]
 packages = ["TradingView"]
